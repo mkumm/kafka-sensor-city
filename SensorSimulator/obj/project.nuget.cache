@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "geGFg9UD7JI=",
+  "success": true,
+  "projectFilePath": "/Users/mkumm/Dev/Sandbox/Kafka/SensorSimulator/SensorSimulator.csproj",
+  "expectedPackageFiles": [
+    "/Users/mkumm/.nuget/packages/confluent.kafka/2.13.2/confluent.kafka.2.13.2.nupkg.sha512",
+    "/Users/mkumm/.nuget/packages/librdkafka.redist/2.13.2/librdkafka.redist.2.13.2.nupkg.sha512"
+  ],
+  "logs": []
+}

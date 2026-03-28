@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart City Traffic Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f1117;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    h1 { font-size: 20px; font-weight: 500; letter-spacing: 0.02em; }
+
+    #status {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: #1e2330;
+      color: #94a3b8;
+    }
+
+    #status.connected { color: #4ade80; }
+
+    #stats {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    #stats span { color: #e2e8f0; font-weight: 500; }
+
+    .city {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+
+    .district {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .district-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .intersections {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .intersection {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #2d3748;
+      border: 2px solid #3d4a5c;
+      cursor: pointer;
+      transition: background 0.4s ease, border-color 0.4s ease, transform 0.2s ease;
+      position: relative;
+    }
+
+    .intersection.normal {
+      background: #166534;
+      border-color: #4ade80;
+    }
+
+    .intersection.congested {
+      background: #7f1d1d;
+      border-color: #f87171;
+    }
+
+    .intersection.pulse {
+      animation: pulse 0.6s ease-out;
+    }
+
+    @keyframes pulse {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.5); }
+      100% { transform: scale(1); }
+    }
+
+    .tooltip {
+      display: none;
+      position: fixed;
+      background: #1e2330;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      line-height: 1.8;
+      color: #cbd5e1;
+      z-index: 100;
+      pointer-events: none;
+      min-width: 200px;
+    }
+
+    .tooltip.visible { display: block; }
+    .tooltip .tid { font-weight: 600; color: #e2e8f0; margin-bottom: 4px; }
+    .tooltip .normal  { color: #4ade80; }
+    .tooltip .congested { color: #f87171; }
+
+    #event-log {
+      margin-top: 24px;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 16px;
+      max-height: 160px;
+      overflow-y: auto;
+      font-size: 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .log-entry {
+      padding: 3px 0;
+      border-bottom: 1px solid #1e2330;
+      color: #64748b;
+    }
+
+    .log-entry .time { color: #475569; }
+    .log-entry .int-id { color: #93c5fd; }
+    .log-entry .congested { color: #f87171; }
+    .log-entry .normal { color: #4ade80; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Smart City Traffic Dashboard</h1>
+  <div id="status">Connecting...</div>
+</header>
+
+<div id="stats">
+  Intersections tracked: <span id="stat-tracked">0</span>
+  &nbsp;·&nbsp;
+  Congested now: <span id="stat-congested">0</span>
+  &nbsp;·&nbsp;
+  State changes: <span id="stat-changes">0</span>
+</div>
+
+<div class="city" id="city"></div>
+
+<div id="event-log"></div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+  const state     = {};
+  let totalChanges = 0;
+
+  // Build the city grid - 5 districts, placeholders for intersections
+  const city = document.getElementById('city');
+  for (let d = 1; d <= 5; d++) {
+    const district = document.createElement('div');
+    district.className = 'district';
+    district.innerHTML = `<div class="district-label">District ${d}</div>
+                          <div class="intersections" id="district-${d}"></div>`;
+    city.appendChild(district);
+  }
+
+  function getOrCreateDot(intId, districtId) {
+    let dot = document.getElementById(intId);
+    if (!dot) {
+      const districtNum = districtId.replace('district-', '');
+      const container   = document.getElementById(`district-${districtNum}`);
+      if (!container) return null;
+
+      dot = document.createElement('div');
+      dot.className = 'intersection';
+      dot.id = intId;
+
+      dot.addEventListener('mousemove', e => showTooltip(e, intId));
+      dot.addEventListener('mouseleave', () => hideTooltip());
+      container.appendChild(dot);
+    }
+    return dot;
+  }
+
+  function applyState(s) {
+    state[s.intersectionId] = s;
+    const dot = getOrCreateDot(s.intersectionId, s.districtId);
+    if (!dot) return;
+
+    const status = s.status.toLowerCase();
+    dot.className = `intersection ${status} pulse`;
+    setTimeout(() => dot.classList.remove('pulse'), 700);
+
+    updateStats();
+  }
+
+  function updateStats() {
+    const tracked   = Object.keys(state).length;
+    const congested = Object.values(state).filter(s => s.status === 'Congested').length;
+    document.getElementById('stat-tracked').textContent   = tracked;
+    document.getElementById('stat-congested').textContent = congested;
+    document.getElementById('stat-changes').textContent   = totalChanges;
+  }
+
+  function logEvent(s) {
+    const log   = document.getElementById('event-log');
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    const time   = new Date(s.timestampUtc).toLocaleTimeString();
+    const status = s.status.toLowerCase();
+    entry.innerHTML =
+      `<span class="time">${time}</span> ` +
+      `<span class="int-id">${s.intersectionId}</span> → ` +
+      `<span class="${status}">${s.status}</span> ` +
+      `· ${s.vehicleCount} vehicles · ${s.speedAvgKmh} km/h`;
+    log.prepend(entry);
+    if (log.children.length > 50) log.lastChild.remove();
+  }
+
+  function showTooltip(e, intId) {
+    const s = state[intId];
+    if (!s) return;
+    const tip    = document.getElementById('tooltip');
+    const status = s.status.toLowerCase();
+    tip.innerHTML =
+      `<div class="tid">${s.intersectionId}</div>` +
+      `<div>District: ${s.districtId}</div>` +
+      `<div>Status: <span class="${status}">${s.status}</span></div>` +
+      `<div>Vehicles: ${s.vehicleCount}</div>` +
+      `<div>Speed: ${s.speedAvgKmh} km/h</div>` +
+      `<div>Occupancy: ${s.occupancyPct}%</div>` +
+      `<div style="color:#475569;margin-top:4px;font-size:11px">${s.reason}</div>`;
+    tip.style.left = (e.clientX + 12) + 'px';
+    tip.style.top  = (e.clientY + 12) + 'px';
+    tip.classList.add('visible');
+  }
+
+  function hideTooltip() {
+    document.getElementById('tooltip').classList.remove('visible');
+  }
+
+  // SignalR connection
+  const connection = new signalR.HubConnectionBuilder()
+    .withUrl('/traffic')
+    .withAutomaticReconnect()
+    .build();
+
+  connection.on('InitialState', states => {
+    states.forEach(applyState);
+  });
+
+  connection.on('StateChange', s => {
+    totalChanges++;
+    applyState(s);
+    logEvent(s);
+  });
+
+  connection.onreconnecting(() => {
+    document.getElementById('status').textContent = 'Reconnecting...';
+    document.getElementById('status').className   = '';
+  });
+
+  connection.onreconnected(() => {
+    document.getElementById('status').textContent = 'Connected';
+    document.getElementById('status').className   = 'connected';
+  });
+
+  async function start() {
+    try {
+      await connection.start();
+      document.getElementById('status').textContent = 'Connected';
+      document.getElementById('status').className   = 'connected';
+    } catch (e) {
+      setTimeout(start, 2000);
+    }
+  }
+
+  start();
+</script>
+</body>
+</html>

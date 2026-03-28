@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "dgSpecHash": "pjTAjfCk8Zs=",
+  "success": true,
+  "projectFilePath": "/Users/mkumm/Dev/Sandbox/Kafka/DashboardService/DashboardService.csproj",
+  "expectedPackageFiles": [
+    "/Users/mkumm/.nuget/packages/confluent.kafka/2.13.2/confluent.kafka.2.13.2.nupkg.sha512",
+    "/Users/mkumm/.nuget/packages/librdkafka.redist/2.13.2/librdkafka.redist.2.13.2.nupkg.sha512",
+    "/Users/mkumm/.nuget/packages/microsoft.aspnetcore.signalr/1.2.9/microsoft.aspnetcore.signalr.1.2.9.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.AspNetCore.SignalR will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "/Users/mkumm/Dev/Sandbox/Kafka/DashboardService/DashboardService.csproj",
+      "warningLevel": 1,
+      "filePath": "/Users/mkumm/Dev/Sandbox/Kafka/DashboardService/DashboardService.csproj",
+      "libraryId": "Microsoft.AspNetCore.SignalR",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}
