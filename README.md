@@ -7,7 +7,7 @@ stream, and displays live traffic state on a web dashboard.
 Built to demonstrate **why Kafka exists** and **how it differs from a message
 queue like RabbitMQ** — through working code you can actually run.
 
-![Dashboard screenshot showing green and red intersection dots across 5 districts](./docs/dashboard.png)
+![Dashboard screenshot showing green and red intersection dots across 5 districts](docs/dashboard.png)
 
 ---
 
