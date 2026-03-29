@@ -134,25 +134,30 @@
 <!-- ANIMATED PARTICLES                                         -->
 <!--                                                           -->
 <!-- Pipeline: x=115 → x=892, distance=777px                  -->
-<!-- Intersection dur=7s → speed ≈ 111px/s                    -->
-<!-- Filter center x=284, distance from start = 169px          -->
-<!-- Time to reach filter: 169 / 111 = 1.52s                  -->
+<!-- Speed ≈ 111px/s (777 / 7s)                               -->
+<!-- Filter center x=284: (284-115)/111 = 1.52s from start    -->
 <!-- Non-intersection total dur = 1.52 + 0.80 = 2.32s         -->
 <!-- keyTime at filter: 1.52 / 2.32 = 0.655                   -->
+<!--                                                           -->
+<!-- Aggregation:                                              -->
+<!-- Aggregator center x=529: (529-115)/111 = 3.73s           -->
+<!-- Green particles stop here (fade into aggregator)         -->
+<!-- In 7s cycle: keyTime for x=529 = 3.73/7 = 0.533         -->
+<!-- 1 amber state-change particle exits x=583 per cycle      -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 
-<!-- INTERSECTION (green) — 3 particles, staggered 2.33s apart -->
+<!-- INTERSECTION (green) — 3 particles feed INTO aggregator, absorbed there -->
 <circle cx="115" cy="130" r="4.5" fill="#4ade80" opacity="0">
-  <animate attributeName="cx"      from="115" to="892" dur="7s" repeatCount="indefinite" begin="0s"/>
-  <animate attributeName="opacity" values="0;1;1;0"    keyTimes="0;0.04;0.93;1" dur="7s" repeatCount="indefinite" begin="0s"/>
+  <animate attributeName="cx"      values="115;529;529" keyTimes="0;0.533;1" dur="7s" repeatCount="indefinite" begin="0s"/>
+  <animate attributeName="opacity" values="0;1;1;0;0"   keyTimes="0;0.04;0.50;0.57;1" dur="7s" repeatCount="indefinite" begin="0s"/>
 </circle>
 <circle cx="115" cy="130" r="4.5" fill="#4ade80" opacity="0">
-  <animate attributeName="cx"      from="115" to="892" dur="7s" repeatCount="indefinite" begin="2.33s"/>
-  <animate attributeName="opacity" values="0;1;1;0"    keyTimes="0;0.04;0.93;1" dur="7s" repeatCount="indefinite" begin="2.33s"/>
+  <animate attributeName="cx"      values="115;529;529" keyTimes="0;0.533;1" dur="7s" repeatCount="indefinite" begin="2.33s"/>
+  <animate attributeName="opacity" values="0;1;1;0;0"   keyTimes="0;0.04;0.50;0.57;1" dur="7s" repeatCount="indefinite" begin="2.33s"/>
 </circle>
 <circle cx="115" cy="130" r="4.5" fill="#4ade80" opacity="0">
-  <animate attributeName="cx"      from="115" to="892" dur="7s" repeatCount="indefinite" begin="4.66s"/>
-  <animate attributeName="opacity" values="0;1;1;0"    keyTimes="0;0.04;0.93;1" dur="7s" repeatCount="indefinite" begin="4.66s"/>
+  <animate attributeName="cx"      values="115;529;529" keyTimes="0;0.533;1" dur="7s" repeatCount="indefinite" begin="4.66s"/>
+  <animate attributeName="opacity" values="0;1;1;0;0"   keyTimes="0;0.04;0.50;0.57;1" dur="7s" repeatCount="indefinite" begin="4.66s"/>
 </circle>
 
 <!-- HIGHWAY (slate) — 2 particles, drop at filter -->
@@ -179,6 +184,24 @@
   <animate attributeName="cx"      values="115;284;284" keyTimes="0;0.655;1" dur="2.32s" repeatCount="indefinite" begin="5.6s"/>
   <animate attributeName="cy"      values="130;130;220" keyTimes="0;0.655;1" dur="2.32s" repeatCount="indefinite" begin="5.6s"/>
   <animate attributeName="opacity" values="0;1;1;0.3;0" keyTimes="0;0.05;0.6;0.88;1" dur="2.32s" repeatCount="indefinite" begin="5.6s"/>
+</circle>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- AGGREGATOR — rolling window glow + state-change output    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<!-- Aggregator rolling-window pulse: orange stroke breathes to show active windowing -->
+<rect x="475" y="107" width="108" height="46" rx="6" fill="none" stroke="#38bdf8" stroke-width="0" opacity="0">
+  <animate attributeName="stroke-width" values="0;2;0"   keyTimes="0;0.35;1" dur="2.1s" repeatCount="indefinite"/>
+  <animate attributeName="opacity"      values="0;0.65;0" keyTimes="0;0.35;1" dur="2.1s" repeatCount="indefinite"/>
+</rect>
+
+<!-- STATE CHANGE (orange) — 1 particle per 7s cycle exits aggregator -->
+<!-- Fewer output events than the 3 green inputs = visible aggregation ratio -->
+<!-- cx travels 583→892 (309px) in first 40% of 7s ≈ 2.8s at ~110px/s   -->
+<circle cx="583" cy="130" r="5.5" fill="#38bdf8" opacity="0">
+  <animate attributeName="cx"      values="583;892;892" keyTimes="0;0.4;1"          dur="7s" repeatCount="indefinite" begin="1.5s"/>
+  <animate attributeName="opacity" values="0;1;1;0;0"   keyTimes="0;0.03;0.37;0.42;1" dur="7s" repeatCount="indefinite" begin="1.5s"/>
 </circle>
 
 </svg>
