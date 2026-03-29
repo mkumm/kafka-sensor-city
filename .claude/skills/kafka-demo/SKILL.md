@@ -1,9 +1,62 @@
 ---
 name: kafka-demo
-description: Start the full kafka-sensor-city demo from scratch. Starts minikube, deploys Kafka, creates topics, builds and deploys all services, and opens the dashboard.
+description: Manage the kafka-sensor-city demo. Run with no arguments to start the full demo. Run with "teardown" to remove all resources. Run with "teardown full" to also delete the minikube cluster.
 allowed-tools: Bash(minikube *), Bash(kubectl *), Bash(docker *)
 context: fork
 ---
+
+Check `$ARGUMENTS` first and branch accordingly:
+
+- If `$ARGUMENTS` starts with `teardown` → jump to the **TEARDOWN** section below.
+- Otherwise → run the **SETUP** section.
+
+---
+
+# TEARDOWN
+
+Determine the teardown scope from `$ARGUMENTS`:
+- `teardown` alone → remove all demo resources but leave minikube running
+- `teardown full` → remove all demo resources **and** delete the minikube cluster
+
+## Step T1 — Delete all demo deployments
+
+```
+kubectl delete deployment sensor-simulator aggregator-service filter-service dashboard-service -n kafka --ignore-not-found
+```
+
+Confirm they are gone:
+```
+kubectl get deployments -n kafka
+```
+
+## Step T2 — Delete the kafka namespace
+
+This removes Kafka, all services, PVCs, and the ConfigMap in one shot:
+```
+kubectl delete namespace kafka --ignore-not-found
+```
+
+Wait until the namespace is fully terminated:
+```
+kubectl get namespace kafka
+```
+
+It should return `Error from server (NotFound)` — retry up to 60 seconds.
+
+## Step T3 — minikube (conditional)
+
+If `$ARGUMENTS` is `teardown full`:
+```
+minikube delete
+```
+Inform the user the entire cluster and all cached images have been removed.
+
+If `$ARGUMENTS` is just `teardown`:
+Inform the user that minikube is still running. They can run `/kafka-demo` to redeploy, or `minikube stop` / `minikube delete` manually when done.
+
+---
+
+# SETUP
 
 You are setting up the kafka-sensor-city demo end to end. Work through the steps below in order. After each shell command, check the output before continuing — stop and report clearly if anything fails.
 

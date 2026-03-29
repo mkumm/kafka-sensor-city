@@ -72,6 +72,13 @@
       gap: 6px;
     }
 
+    .intersection-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
     .intersection {
       width: 28px;
       height: 28px;
@@ -81,6 +88,13 @@
       cursor: pointer;
       transition: background 0.4s ease, border-color 0.4s ease, transform 0.2s ease;
       position: relative;
+    }
+
+    .int-label {
+      font-size: 9px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: #334155;
+      line-height: 1;
     }
 
     .intersection.normal {
@@ -260,37 +274,48 @@
   const state     = {};
   let totalChanges = 0;
 
-  // Build the city grid - 5 districts, placeholders for intersections
+  // Pre-populate all intersections as gray — must match CitySimulator.IntersectionsPerDistrict
+  const INTERSECTIONS_PER_DISTRICT = 12;
+  const DISTRICTS = 5;
+
   const city = document.getElementById('city');
-  for (let d = 1; d <= 5; d++) {
+  for (let d = 1; d <= DISTRICTS; d++) {
     const district = document.createElement('div');
     district.className = 'district';
     district.innerHTML = `<div class="district-label">District ${d}</div>
                           <div class="intersections" id="district-${d}"></div>`;
     city.appendChild(district);
-  }
 
-  function getOrCreateDot(intId, districtId) {
-    let dot = document.getElementById(intId);
-    if (!dot) {
-      const districtNum = districtId.replace('district-', '');
-      const container   = document.getElementById(`district-${districtNum}`);
-      if (!container) return null;
+    const container = district.querySelector('.intersections');
+    for (let i = 1; i <= INTERSECTIONS_PER_DISTRICT; i++) {
+      const intId = `int-${String(d).padStart(2,'0')}${String(i).padStart(2,'0')}`;
 
-      dot = document.createElement('div');
+      const wrap = document.createElement('div');
+      wrap.className = 'intersection-wrap';
+
+      const dot = document.createElement('div');
       dot.className = 'intersection';
       dot.id = intId;
-
       dot.addEventListener('mousemove', e => showTooltip(e, intId));
       dot.addEventListener('mouseleave', () => hideTooltip());
-      container.appendChild(dot);
+
+      const label = document.createElement('div');
+      label.className = 'int-label';
+      label.textContent = intId.replace('int-', '');
+
+      wrap.appendChild(dot);
+      wrap.appendChild(label);
+      container.appendChild(wrap);
     }
-    return dot;
+  }
+
+  function getOrCreateDot(intId) {
+    return document.getElementById(intId);
   }
 
   function applyState(s) {
     state[s.intersectionId] = s;
-    const dot = getOrCreateDot(s.intersectionId, s.districtId);
+    const dot = getOrCreateDot(s.intersectionId);
     if (!dot) return;
 
     const status = s.status.toLowerCase();

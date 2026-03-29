@@ -9,6 +9,8 @@ queue like RabbitMQ** — through working code you can actually run.
 
 ![Dashboard screenshot showing green and red intersection dots across 5 districts](docs/dashboard.png)
 
+![Animated pipeline diagram showing sensor events flowing through filter, aggregator, and dashboard](docs/pipeline.svg)
+
 ---
 
 ## What's running
@@ -244,6 +246,46 @@ kubectl logs -n kafka deployment/aggregator-service --follow
 # What the dashboard is broadcasting
 kubectl logs -n kafka deployment/dashboard-service --follow
 ```
+
+---
+
+## Sample records
+
+**`raw-sensor-events`** — produced by the simulator at ~20 events/sec:
+```json
+{
+  "sensorId": "sensor-district-2-intersection-005",
+  "sensorType": "Intersection",
+  "districtId": "district-2",
+  "intersectionId": "int-0205",
+  "vehicleCount": 22,
+  "speedAvgKmh": 14.3,
+  "occupancyPct": 88,
+  "isCongested": true,
+  "timestampUtc": "2024-11-01T09:14:32.101Z",
+  "sequenceNum": 4821
+}
+```
+
+`isCongested` is `true` when `occupancyPct > 75` and `speedAvgKmh < 25` simultaneously. Highway, parking, and pedestrian sensor events look the same but have a null `intersectionId` and are dropped by the filter service.
+
+---
+
+**`signal-state-changes`** — produced by the aggregator only when an intersection flips state:
+```json
+{
+  "intersectionId": "int-0205",
+  "districtId": "district-2",
+  "status": "Congested",
+  "vehicleCount": 22,
+  "speedAvgKmh": 14.3,
+  "occupancyPct": 88,
+  "timestampUtc": "2024-11-01T09:14:32.208Z",
+  "reason": "3 congested events in last 30s window"
+}
+```
+
+This is the only topic the dashboard consumes. A dot only pulses when this record arrives — not on every sensor reading.
 
 ---
 

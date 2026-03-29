@@ -13,12 +13,15 @@ public class CitySimulator
     private long _seq = 0;
     private readonly Random _rng = new();
 
-    private static readonly (SensorType Type, int Weight)[] TypeWeights =
+    // Fixed count so the dashboard can pre-populate all dots without waiting
+    // for the first state change from each intersection
+    public const int IntersectionsPerDistrict = 12;
+
+    private static readonly (SensorType Type, int Weight)[] NonIntersectionWeights =
     [
-        (SensorType.Intersection, 30),
-        (SensorType.Highway,      35),
-        (SensorType.Parking,      20),
-        (SensorType.Pedestrian,   15)
+        (SensorType.Highway,    35),
+        (SensorType.Parking,    20),
+        (SensorType.Pedestrian, 15)
     ];
 
     public CitySimulator(int districts = 5, int sensorsPerDistrict = 40)
@@ -26,24 +29,26 @@ public class CitySimulator
         for (int d = 1; d <= districts; d++)
         {
             string districtId = $"district-{d}";
-            int intersectionCount = 0;
 
-            for (int s = 1; s <= sensorsPerDistrict; s++)
+            for (int i = 1; i <= IntersectionsPerDistrict; i++)
             {
-                var type = PickWeightedType();
-                string? intersectionId = null;
+                _sensors.Add(new Sensor(
+                    Id:             $"sensor-{districtId}-intersection-{i:D3}",
+                    Type:           SensorType.Intersection,
+                    DistrictId:     districtId,
+                    IntersectionId: $"int-{d:D2}{i:D2}"
+                ));
+            }
 
-                if (type == SensorType.Intersection)
-                {
-                    intersectionCount++;
-                    intersectionId = $"int-{d:D2}{intersectionCount:D2}";
-                }
-
+            int remaining = sensorsPerDistrict - IntersectionsPerDistrict;
+            for (int s = 1; s <= remaining; s++)
+            {
+                var type = PickWeightedNonIntersectionType();
                 _sensors.Add(new Sensor(
                     Id:             $"sensor-{districtId}-{type.ToString().ToLower()}-{s:D3}",
                     Type:           type,
                     DistrictId:     districtId,
-                    IntersectionId: intersectionId
+                    IntersectionId: null
                 ));
             }
         }
@@ -90,18 +95,18 @@ public class CitySimulator
         return (vehicleCount, speedAvgKmh, occupancyPct);
     }
 
-    private SensorType PickWeightedType()
+    private SensorType PickWeightedNonIntersectionType()
     {
-        int total = TypeWeights.Sum(x => x.Weight);
+        int total = NonIntersectionWeights.Sum(x => x.Weight);
         int roll  = _rng.Next(total);
         int cum   = 0;
 
-        foreach (var (type, weight) in TypeWeights)
+        foreach (var (type, weight) in NonIntersectionWeights)
         {
             cum += weight;
             if (roll < cum) return type;
         }
 
-        return SensorType.Intersection;
+        return SensorType.Highway;
     }
 }

@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 265" width="900">
+<defs>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .box-svc   { fill:#1a1f2e; stroke:#2d3748; stroke-width:1.5; }
+    .box-topic { fill:#141820; stroke:#1e293b; stroke-width:1; stroke-dasharray:5,3; }
+    .lbl       { fill:#e2e8f0; font-size:11px; }
+    .sub       { fill:#475569; font-size:9px; }
+    .dim       { fill:#334155; font-size:9px; letter-spacing:0.08em; }
+    .drop-lbl  { fill:#f87171; font-size:9px; }
+  </style>
+</defs>
+
+<!-- Background -->
+<rect width="900" height="265" fill="#0f1117"/>
+
+<!-- ─── Main pipeline line ─── -->
+<line x1="115" y1="130" x2="892" y2="130" stroke="#1e2330" stroke-width="2"/>
+
+<!-- ─── Drop line (dashed) below filter-service ─── -->
+<line x1="284" y1="153" x2="284" y2="220" stroke="#1e2330" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SENSOR PANEL                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<rect x="8" y="48" width="107" height="168" rx="8" class="box-svc"/>
+<text x="61" y="65" text-anchor="middle" class="dim">SENSORS</text>
+
+<circle cx="24" cy="91"  r="5" fill="#4ade80"/>
+<text x="36" y="95"  class="lbl">Intersection</text>
+<text x="36" y="107" class="sub">~30% of events</text>
+
+<circle cx="24" cy="127" r="5" fill="#64748b"/>
+<text x="36" y="131" class="lbl">Highway</text>
+<text x="36" y="143" class="sub">~35% of events</text>
+
+<circle cx="24" cy="163" r="5" fill="#f59e0b"/>
+<text x="36" y="167" class="lbl">Parking</text>
+<text x="36" y="179" class="sub">~20% of events</text>
+
+<circle cx="24" cy="199" r="5" fill="#a78bfa"/>
+<text x="36" y="203" class="lbl">Pedestrian</text>
+<text x="36" y="215" class="sub">~15% of events</text>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ARROWHEADS                                                 -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<polygon points="115,126 115,134 121,130" fill="#2d3748"/>
+<polygon points="229,126 229,134 235,130" fill="#2d3748"/>
+<polygon points="333,126 333,134 339,130" fill="#2d3748"/>
+<polygon points="469,126 469,134 475,130" fill="#2d3748"/>
+<polygon points="583,126 583,134 589,130" fill="#2d3748"/>
+<polygon points="737,126 737,134 743,130" fill="#2d3748"/>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PIPELINE BOXES                                             -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<!-- raw-sensor-events (topic, dashed) -->
+<rect x="121" y="107" width="108" height="46" rx="6" class="box-topic"/>
+<text x="175" y="127" text-anchor="middle" class="lbl">raw-sensor-events</text>
+<text x="175" y="141" text-anchor="middle" class="sub">6 partitions · ~20/sec</text>
+
+<!-- filter-service -->
+<rect x="235" y="107" width="98" height="46" rx="6" class="box-svc"/>
+<text x="284" y="127" text-anchor="middle" class="lbl">filter-service</text>
+<text x="284" y="141" text-anchor="middle" class="drop-lbl">drops ~64%</text>
+
+<!-- intersection-events (topic, dashed) -->
+<rect x="339" y="107" width="130" height="46" rx="6" class="box-topic"/>
+<text x="404" y="127" text-anchor="middle" class="lbl">intersection-events</text>
+<text x="404" y="141" text-anchor="middle" class="sub">4 partitions</text>
+
+<!-- aggregator-service -->
+<rect x="475" y="107" width="108" height="46" rx="6" class="box-svc"/>
+<text x="529" y="127" text-anchor="middle" class="lbl">aggregator</text>
+<text x="529" y="141" text-anchor="middle" class="sub">30s rolling window</text>
+
+<!-- signal-state-changes (topic, dashed) -->
+<rect x="589" y="107" width="148" height="46" rx="6" class="box-topic"/>
+<text x="663" y="124" text-anchor="middle" class="lbl">signal-state-changes</text>
+<text x="663" y="138" text-anchor="middle" class="sub">4 partitions</text>
+<text x="663" y="149" text-anchor="middle" class="sub">state changes only</text>
+
+<!-- dashboard-service -->
+<rect x="743" y="107" width="149" height="46" rx="6" class="box-svc"/>
+<text x="817" y="124" text-anchor="middle" class="lbl">dashboard</text>
+
+<!-- Mini animated intersection dot grid -->
+<circle cx="762" cy="141" r="4" fill="#166534" stroke="#4ade80" stroke-width="1.5">
+  <animate attributeName="fill"   values="#166534;#7f1d1d;#166534" dur="4.3s" repeatCount="indefinite" begin="1.2s"/>
+  <animate attributeName="stroke" values="#4ade80;#f87171;#4ade80" dur="4.3s" repeatCount="indefinite" begin="1.2s"/>
+</circle>
+<circle cx="777" cy="141" r="4" fill="#7f1d1d" stroke="#f87171" stroke-width="1.5">
+  <animate attributeName="fill"   values="#7f1d1d;#166534;#7f1d1d" dur="5.1s" repeatCount="indefinite" begin="0.5s"/>
+  <animate attributeName="stroke" values="#f87171;#4ade80;#f87171" dur="5.1s" repeatCount="indefinite" begin="0.5s"/>
+</circle>
+<circle cx="792" cy="141" r="4" fill="#166534" stroke="#4ade80" stroke-width="1.5">
+  <animate attributeName="fill"   values="#166534;#7f1d1d;#166534;#166534" dur="6.7s" repeatCount="indefinite" begin="2.1s"/>
+  <animate attributeName="stroke" values="#4ade80;#f87171;#4ade80;#4ade80" dur="6.7s" repeatCount="indefinite" begin="2.1s"/>
+</circle>
+<circle cx="807" cy="141" r="4" fill="#166534" stroke="#4ade80" stroke-width="1.5"/>
+<circle cx="822" cy="141" r="4" fill="#7f1d1d" stroke="#f87171" stroke-width="1.5">
+  <animate attributeName="fill"   values="#7f1d1d;#166534;#166534;#7f1d1d" dur="3.8s" repeatCount="indefinite" begin="3.5s"/>
+  <animate attributeName="stroke" values="#f87171;#4ade80;#4ade80;#f87171" dur="3.8s" repeatCount="indefinite" begin="3.5s"/>
+</circle>
+<circle cx="837" cy="141" r="4" fill="#166534" stroke="#4ade80" stroke-width="1.5">
+  <animate attributeName="fill"   values="#166534;#166534;#7f1d1d;#166534" dur="7.2s" repeatCount="indefinite" begin="4.8s"/>
+  <animate attributeName="stroke" values="#4ade80;#4ade80;#f87171;#4ade80" dur="7.2s" repeatCount="indefinite" begin="4.8s"/>
+</circle>
+<circle cx="852" cy="141" r="4" fill="#166534" stroke="#4ade80" stroke-width="1.5">
+  <animate attributeName="fill"   values="#166534;#7f1d1d;#166534" dur="9.1s" repeatCount="indefinite" begin="6.3s"/>
+  <animate attributeName="stroke" values="#4ade80;#f87171;#4ade80" dur="9.1s" repeatCount="indefinite" begin="6.3s"/>
+</circle>
+<circle cx="867" cy="141" r="4" fill="#166534" stroke="#4ade80" stroke-width="1.5"/>
+<circle cx="882" cy="141" r="4" fill="#7f1d1d" stroke="#f87171" stroke-width="1.5">
+  <animate attributeName="fill"   values="#7f1d1d;#7f1d1d;#166534;#7f1d1d" dur="5.5s" repeatCount="indefinite" begin="1.8s"/>
+  <animate attributeName="stroke" values="#f87171;#f87171;#4ade80;#f87171" dur="5.5s" repeatCount="indefinite" begin="1.8s"/>
+</circle>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- DROP ZONE                                                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<text x="284" y="236" text-anchor="middle" class="dim">highway · parking · pedestrian</text>
+<text x="284" y="250" text-anchor="middle" fill="#1e293b" font-size="9px">not intersection sensors</text>
+
+<!-- Static faded dropped-particle echoes -->
+<circle cx="266" cy="221" r="3" fill="#64748b" opacity="0.3"/>
+<circle cx="278" cy="225" r="3" fill="#f59e0b" opacity="0.3"/>
+<circle cx="291" cy="222" r="3" fill="#a78bfa" opacity="0.3"/>
+<circle cx="303" cy="225" r="3" fill="#64748b" opacity="0.2"/>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ANIMATED PARTICLES                                         -->
+<!--                                                           -->
+<!-- Pipeline: x=115 → x=892, distance=777px                  -->
+<!-- Intersection dur=7s → speed ≈ 111px/s                    -->
+<!-- Filter center x=284, distance from start = 169px          -->
+<!-- Time to reach filter: 169 / 111 = 1.52s                  -->
+<!-- Non-intersection total dur = 1.52 + 0.80 = 2.32s         -->
+<!-- keyTime at filter: 1.52 / 2.32 = 0.655                   -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<!-- INTERSECTION (green) — 3 particles, staggered 2.33s apart -->
+<circle cx="115" cy="130" r="4.5" fill="#4ade80" opacity="0">
+  <animate attributeName="cx"      from="115" to="892" dur="7s" repeatCount="indefinite" begin="0s"/>
+  <animate attributeName="opacity" values="0;1;1;0"    keyTimes="0;0.04;0.93;1" dur="7s" repeatCount="indefinite" begin="0s"/>
+</circle>
+<circle cx="115" cy="130" r="4.5" fill="#4ade80" opacity="0">
+  <animate attributeName="cx"      from="115" to="892" dur="7s" repeatCount="indefinite" begin="2.33s"/>
+  <animate attributeName="opacity" values="0;1;1;0"    keyTimes="0;0.04;0.93;1" dur="7s" repeatCount="indefinite" begin="2.33s"/>
+</circle>
+<circle cx="115" cy="130" r="4.5" fill="#4ade80" opacity="0">
+  <animate attributeName="cx"      from="115" to="892" dur="7s" repeatCount="indefinite" begin="4.66s"/>
+  <animate attributeName="opacity" values="0;1;1;0"    keyTimes="0;0.04;0.93;1" dur="7s" repeatCount="indefinite" begin="4.66s"/>
+</circle>
+
+<!-- HIGHWAY (slate) — 2 particles, drop at filter -->
+<circle cx="115" cy="130" r="4.5" fill="#64748b" opacity="0">
+  <animate attributeName="cx"      values="115;284;284" keyTimes="0;0.655;1" dur="2.32s" repeatCount="indefinite" begin="0.7s"/>
+  <animate attributeName="cy"      values="130;130;220" keyTimes="0;0.655;1" dur="2.32s" repeatCount="indefinite" begin="0.7s"/>
+  <animate attributeName="opacity" values="0;1;1;0.3;0" keyTimes="0;0.05;0.6;0.88;1" dur="2.32s" repeatCount="indefinite" begin="0.7s"/>
+</circle>
+<circle cx="115" cy="130" r="4.5" fill="#64748b" opacity="0">
+  <animate attributeName="cx"      values="115;284;284" keyTimes="0;0.655;1" dur="2.32s" repeatCount="indefinite" begin="4.1s"/>
+  <animate attributeName="cy"      values="130;130;220" keyTimes="0;0.655;1" dur="2.32s" repeatCount="indefinite" begin="4.1s"/>
+  <animate attributeName="opacity" values="0;1;1;0.3;0" keyTimes="0;0.05;0.6;0.88;1" dur="2.32s" repeatCount="indefinite" begin="4.1s"/>
+</circle>
+
+<!-- PARKING (amber) — 1 particle, drops at filter -->
+<circle cx="115" cy="130" r="4.5" fill="#f59e0b" opacity="0">
+  <animate attributeName="cx"      values="115;284;284" keyTimes="0;0.655;1" dur="2.32s" repeatCount="indefinite" begin="1.9s"/>
+  <animate attributeName="cy"      values="130;130;220" keyTimes="0;0.655;1" dur="2.32s" repeatCount="indefinite" begin="1.9s"/>
+  <animate attributeName="opacity" values="0;1;1;0.3;0" keyTimes="0;0.05;0.6;0.88;1" dur="2.32s" repeatCount="indefinite" begin="1.9s"/>
+</circle>
+
+<!-- PEDESTRIAN (purple) — 1 particle, drops at filter -->
+<circle cx="115" cy="130" r="4.5" fill="#a78bfa" opacity="0">
+  <animate attributeName="cx"      values="115;284;284" keyTimes="0;0.655;1" dur="2.32s" repeatCount="indefinite" begin="5.6s"/>
+  <animate attributeName="cy"      values="130;130;220" keyTimes="0;0.655;1" dur="2.32s" repeatCount="indefinite" begin="5.6s"/>
+  <animate attributeName="opacity" values="0;1;1;0.3;0" keyTimes="0;0.05;0.6;0.88;1" dur="2.32s" repeatCount="indefinite" begin="5.6s"/>
+</circle>
+
+</svg>
