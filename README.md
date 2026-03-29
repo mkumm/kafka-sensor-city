@@ -100,10 +100,10 @@ kubectl apply -f k8s/kafka/kafka.yaml
 kubectl get pods -n kafka --watch
 ```
 
-Wait for `kafka-0` to show `1/1 Running`. Then create the three topics:
+Wait for `kafka-0` to show `1/1 Running`. Then exec into the broker pod to create the three topics:
 
 ```bash
-kubectl exec -it kafka-client -n kafka -- /bin/bash
+kubectl exec -it kafka-0 -n kafka -- /bin/bash
 ```
 
 Inside the pod:
