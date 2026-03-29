@@ -82,6 +82,20 @@ Download the .NET 10 SDK from [dot.net](https://dotnet.microsoft.com/download).
 
 ---
 
+## Automated setup with Claude Code
+
+If you have [Claude Code](https://claude.ai/code) installed, the repo includes a skill that runs the full setup for you:
+
+```
+/kafka-demo
+```
+
+This handles every step below — starting minikube, deploying Kafka, creating topics, building and deploying all services, and opening the dashboard. If anything fails it will diagnose the problem automatically.
+
+Otherwise, follow the manual steps below.
+
+---
+
 ## Getting started
 
 ### 1. Start minikube
