@@ -182,8 +182,10 @@ sensor-simulator-xxx                 1/1     Running   0
 minikube service dashboard-service -n kafka
 ```
 
-Your browser will open automatically. You should see the city map appear within
-a few seconds as intersections are discovered from the event stream.
+Your browser will open automatically. **Keep this terminal open** — on macOS with
+the Docker driver, minikube holds a tunnel open in the foreground. Closing it
+will drop the connection to the dashboard. You should see the city map appear
+within a few seconds as intersections are discovered from the event stream.
 
 ---
 
@@ -205,7 +207,7 @@ kubectl scale deployment/dashboard-service -n kafka --replicas=1
 minikube service dashboard-service -n kafka
 ```
 
-The dashboard replays every missed state change and catches up to the present.
+Keep the terminal open while the tunnel is running. The dashboard replays every missed state change and catches up to the present.
 In RabbitMQ, those messages would have been lost the moment the consumer
 disconnected.
 
