@@ -1,4 +1,4 @@
-# Smart City Traffic — Kafka on Kubernetes Demo
+# Sensor City Traffic Demo — Kafka on Kubernetes
 
 A fully orchestrated event streaming pipeline running on your laptop. Simulates
 hundreds of road sensors across a fictional city, filters and aggregates the
